@@ -46,7 +46,7 @@ public sealed class OpenMeteoWeatherClient(
             throw new WeatherServiceException("The weather service returned an invalid response.", ex);
         }
 
-        if (response?.Hourly is null)
+        if (response?.Hourly is not { Time.Count: > 0 })
         {
             throw new WeatherServiceException("The weather service returned no hourly data.");
         }
