@@ -1,6 +1,19 @@
 @WeatherApi.Api_HostAddress = http://localhost:5168
 
-GET {{WeatherApi.Api_HostAddress}}/weatherforecast/
+### Valid address -> 200 OK with the shortwave radiation forecast
+GET {{WeatherApi.Api_HostAddress}}/forecast?address=Al%C3%A8s
+Accept: application/json
+
+###
+
+### Empty address -> 400 Bad Request
+GET {{WeatherApi.Api_HostAddress}}/forecast?address=
+Accept: application/json
+
+###
+
+### Address that cannot be resolved -> 404 Not Found
+GET {{WeatherApi.Api_HostAddress}}/forecast?address=xzqwjkasdlkjaslkdjalksdj123456789
 Accept: application/json
 
 ###

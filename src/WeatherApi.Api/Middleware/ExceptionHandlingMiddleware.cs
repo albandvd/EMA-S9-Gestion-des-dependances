@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using WeatherApi.Domain.Exceptions;
 
@@ -56,6 +57,7 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
 
         context.Response.ContentType = "application/problem+json";
         context.Response.StatusCode = statusCode;
-        await context.Response.WriteAsJsonAsync(problemDetails);
+        var bytes = JsonSerializer.SerializeToUtf8Bytes(problemDetails);
+        await context.Response.Body.WriteAsync(bytes);
     }
 }
