@@ -1,0 +1,13 @@
+<Project>
+
+  <!--
+    RollForward=Major only kicks in when no matching net8.0 runtime is found on the
+    machine, letting the app fall back to a newer installed major version (e.g. .NET 10
+    in this sandbox). On a machine with the .NET 8 runtime installed, net8.0 is used
+    as normal — this does not change the project's target framework.
+  -->
+  <PropertyGroup>
+    <RollForward>Major</RollForward>
+  </PropertyGroup>
+
+</Project>
