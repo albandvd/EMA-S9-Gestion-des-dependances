@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using WeatherApi.Application.Interfaces;
 using WeatherApi.Infrastructure.Clients;
+using WeatherApi.Infrastructure.Configuration;
 using WeatherApi.IntegrationTests.Fakes;
 
 namespace WeatherApi.IntegrationTests;
@@ -10,8 +12,8 @@ namespace WeatherApi.IntegrationTests;
 /// <summary>
 /// Boots the real ASP.NET Core pipeline (routing, DI, middleware, JSON) while
 /// swapping the external HTTP clients for deterministic fakes. The fakes are
-/// still wired through the real demo decorators (from AddInfrastructure) so
-/// this factory also exercises TP3's demo mode end to end.
+/// still wired through the real demo/cache decorators (from AddInfrastructure)
+/// so this factory also exercises TP3's demo mode and geocoding cache.
 /// </summary>
 public sealed class WeatherApiFactory : WebApplicationFactory<Program>
 {
@@ -22,7 +24,10 @@ public sealed class WeatherApiFactory : WebApplicationFactory<Program>
             services.RemoveAll<IGeocodingClient>();
             services.AddSingleton<FakeGeocodingClient>();
             services.AddScoped<IGeocodingClient>(sp => new DemoGeocodingClient(
-                sp.GetRequiredService<FakeGeocodingClient>(),
+                new CachingGeocodingClient(
+                    sp.GetRequiredService<FakeGeocodingClient>(),
+                    sp.GetRequiredService<IResponseCache>(),
+                    sp.GetRequiredService<IOptions<CacheOptions>>()),
                 sp.GetRequiredService<IDemoModeContext>()));
 
             services.RemoveAll<IWeatherClient>();

@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using WeatherApi.Application.Interfaces;
+using WeatherApi.Infrastructure.Caching;
 using WeatherApi.Infrastructure.Clients;
 using WeatherApi.Infrastructure.Configuration;
 
@@ -22,6 +23,10 @@ public static class DependencyInjection
         services.AddOptions<OpenMeteoOptions>().Bind(configuration.GetSection(OpenMeteoOptions.SectionName)).ValidateOnStart();
         services.AddOptions<BanOptions>().Bind(configuration.GetSection(BanOptions.SectionName)).ValidateOnStart();
         services.AddOptions<MetNorwayOptions>().Bind(configuration.GetSection(MetNorwayOptions.SectionName)).ValidateOnStart();
+        services.AddOptions<CacheOptions>().Bind(configuration.GetSection(CacheOptions.SectionName)).ValidateOnStart();
+
+        services.AddMemoryCache();
+        services.AddSingleton<IResponseCache, MemoryResponseCache>();
 
         services.AddHttpClient<NominatimGeocodingClient>((sp, client) =>
         {
@@ -60,12 +65,14 @@ public static class DependencyInjection
         var weatherProvider = ProviderSelector.Resolve(
             configuration["Weather:Provider"], WeatherProviders.OpenMeteo, WeatherProviders.All);
 
-        // Demo mode wraps the real provider: it never touches the network once
-        // active, and never changes what the caller (ForecastService) sees.
+        // Composition: real provider -> cache -> demo. Cache never sees demo
+        // requests (they short-circuit before reaching it), and demo never
+        // touches the network.
         services.AddTransient<IGeocodingClient>(sp =>
         {
             var real = sp.GetRequiredKeyedService<IGeocodingClient>(geocodingProvider);
-            return new DemoGeocodingClient(real, sp.GetRequiredService<IDemoModeContext>());
+            var cached = new CachingGeocodingClient(real, sp.GetRequiredService<IResponseCache>(), sp.GetRequiredService<IOptions<CacheOptions>>());
+            return new DemoGeocodingClient(cached, sp.GetRequiredService<IDemoModeContext>());
         });
         services.AddTransient<IWeatherClient>(sp =>
         {

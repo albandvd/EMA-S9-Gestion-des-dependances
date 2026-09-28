@@ -1,6 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.Extensions.DependencyInjection;
 using WeatherApi.Application.DTOs;
+using WeatherApi.IntegrationTests.Fakes;
 
 namespace WeatherApi.IntegrationTests;
 
@@ -51,5 +53,17 @@ public sealed class ForecastEndpointTests(WeatherApiFactory factory) : IClassFix
         Assert.NotNull(body);
         Assert.Equal("this-address-does-not-exist", body!.Address);
         Assert.NotEmpty(body.Hourly);
+    }
+
+    [Fact]
+    public async Task Get_CalledTwiceForSameAddress_OnlyGeocodesOnce()
+    {
+        var geocodingClient = factory.Services.GetRequiredService<FakeGeocodingClient>();
+        var callsBefore = geocodingClient.CallCount;
+
+        await _client.GetAsync("/forecast?address=N%C3%AEmes");
+        await _client.GetAsync("/forecast?address=N%C3%AEmes");
+
+        Assert.Equal(callsBefore + 1, geocodingClient.CallCount);
     }
 }
