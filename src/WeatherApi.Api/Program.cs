@@ -1,4 +1,5 @@
 using WeatherApi.Api.Middleware;
+using WeatherApi.Api.Services;
 using WeatherApi.Application.Interfaces;
 using WeatherApi.Application.Services;
 using WeatherApi.Infrastructure;
@@ -18,6 +19,8 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddScoped<IForecastService, ForecastService>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IDemoModeContext, HttpDemoModeContext>();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();

@@ -38,4 +38,18 @@ public sealed class ForecastEndpointTests(WeatherApiFactory factory) : IClassFix
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
+
+    [Fact]
+    public async Task Get_WithDemoTrue_ReturnsSimulatedDataEvenForAnUnknownAddress()
+    {
+        // The fake geocoding client returns null for this address (would be a
+        // 404 without demo mode) — demo mode must short-circuit before it.
+        var response = await _client.GetAsync("/forecast?address=this-address-does-not-exist&demo=true");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<ForecastResponse>();
+        Assert.NotNull(body);
+        Assert.Equal("this-address-does-not-exist", body!.Address);
+        Assert.NotEmpty(body.Hourly);
+    }
 }

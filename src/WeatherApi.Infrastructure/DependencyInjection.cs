@@ -60,8 +60,18 @@ public static class DependencyInjection
         var weatherProvider = ProviderSelector.Resolve(
             configuration["Weather:Provider"], WeatherProviders.OpenMeteo, WeatherProviders.All);
 
-        services.AddTransient<IGeocodingClient>(sp => sp.GetRequiredKeyedService<IGeocodingClient>(geocodingProvider));
-        services.AddTransient<IWeatherClient>(sp => sp.GetRequiredKeyedService<IWeatherClient>(weatherProvider));
+        // Demo mode wraps the real provider: it never touches the network once
+        // active, and never changes what the caller (ForecastService) sees.
+        services.AddTransient<IGeocodingClient>(sp =>
+        {
+            var real = sp.GetRequiredKeyedService<IGeocodingClient>(geocodingProvider);
+            return new DemoGeocodingClient(real, sp.GetRequiredService<IDemoModeContext>());
+        });
+        services.AddTransient<IWeatherClient>(sp =>
+        {
+            var real = sp.GetRequiredKeyedService<IWeatherClient>(weatherProvider);
+            return new DemoWeatherClient(real, sp.GetRequiredService<IDemoModeContext>());
+        });
 
         return services;
     }
