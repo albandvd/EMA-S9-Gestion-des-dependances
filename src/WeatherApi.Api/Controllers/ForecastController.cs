@@ -9,7 +9,7 @@ namespace WeatherApi.Api.Controllers;
 public sealed class ForecastController(IForecastService forecastService) : ControllerBase
 {
     /// <summary>
-    /// Returns the shortwave radiation hourly forecast for the given address.
+    /// Returns the hourly temperature forecast for the given address.
     /// </summary>
     /// <param name="address">A postal address or city name.</param>
     /// <response code="200">The forecast was retrieved successfully.</response>

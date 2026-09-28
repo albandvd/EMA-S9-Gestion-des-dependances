@@ -23,6 +23,6 @@ public sealed class OpenMeteoHourly
     [JsonPropertyName("time")]
     public List<DateTimeOffset> Time { get; set; } = [];
 
-    [JsonPropertyName("shortwave_radiation")]
-    public List<double?> ShortwaveRadiation { get; set; } = [];
+    [JsonPropertyName("temperature_2m")]
+    public List<double?> Temperature { get; set; } = [];
 }

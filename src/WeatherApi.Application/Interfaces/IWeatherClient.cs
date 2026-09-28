@@ -8,5 +8,5 @@ namespace WeatherApi.Application.Interfaces;
 /// </summary>
 public interface IWeatherClient
 {
-    Task<HourlyShortwaveRadiation> GetHourlyShortwaveRadiationAsync(Coordinates coordinates, CancellationToken cancellationToken);
+    Task<HourlyTemperature> GetHourlyTemperatureAsync(Coordinates coordinates, CancellationToken cancellationToken);
 }

@@ -19,7 +19,7 @@ public sealed class OpenMeteoWeatherClient(
     IOptions<OpenMeteoOptions> options,
     ILogger<OpenMeteoWeatherClient> logger) : IWeatherClient
 {
-    public async Task<HourlyShortwaveRadiation> GetHourlyShortwaveRadiationAsync(Coordinates coordinates, CancellationToken cancellationToken)
+    public async Task<HourlyTemperature> GetHourlyTemperatureAsync(Coordinates coordinates, CancellationToken cancellationToken)
     {
         var lat = coordinates.Latitude.ToString(CultureInfo.InvariantCulture);
         var lon = coordinates.Longitude.ToString(CultureInfo.InvariantCulture);
@@ -51,6 +51,6 @@ public sealed class OpenMeteoWeatherClient(
             throw new WeatherServiceException("The weather service returned no hourly data.");
         }
 
-        return new HourlyShortwaveRadiation(response.Hourly.Time, response.Hourly.ShortwaveRadiation);
+        return new HourlyTemperature(response.Hourly.Time, response.Hourly.Temperature);
     }
 }

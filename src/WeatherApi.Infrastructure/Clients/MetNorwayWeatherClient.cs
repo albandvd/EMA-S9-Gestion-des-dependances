@@ -14,7 +14,7 @@ namespace WeatherApi.Infrastructure.Clients;
 /// </summary>
 public sealed class MetNorwayWeatherClient(HttpClient httpClient, ILogger<MetNorwayWeatherClient> logger) : IWeatherClient
 {
-    public async Task<HourlyShortwaveRadiation> GetHourlyShortwaveRadiationAsync(Coordinates coordinates, CancellationToken cancellationToken)
+    public async Task<HourlyTemperature> GetHourlyTemperatureAsync(Coordinates coordinates, CancellationToken cancellationToken)
     {
         var lat = coordinates.Latitude.ToString(CultureInfo.InvariantCulture);
         var lon = coordinates.Longitude.ToString(CultureInfo.InvariantCulture);
@@ -48,11 +48,8 @@ public sealed class MetNorwayWeatherClient(HttpClient httpClient, ILogger<MetNor
         }
 
         var time = timeseries.Select(entry => entry.Time).ToList();
+        var temperature = timeseries.Select(entry => entry.Data?.Instant?.Details?.AirTemperature).ToList();
 
-        // Locationforecast does not expose shortwave radiation; report it as
-        // unavailable per hour rather than fabricating a value.
-        var shortwaveRadiation = new double?[time.Count];
-
-        return new HourlyShortwaveRadiation(time, shortwaveRadiation);
+        return new HourlyTemperature(time, temperature);
     }
 }

@@ -9,11 +9,11 @@ namespace WeatherApi.IntegrationTests.Fakes;
 /// </summary>
 public sealed class FakeWeatherClient : IWeatherClient
 {
-    public Task<HourlyShortwaveRadiation> GetHourlyShortwaveRadiationAsync(Coordinates coordinates, CancellationToken cancellationToken)
+    public Task<HourlyTemperature> GetHourlyTemperatureAsync(Coordinates coordinates, CancellationToken cancellationToken)
     {
-        var hourly = new HourlyShortwaveRadiation(
+        var hourly = new HourlyTemperature(
             [new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)],
-            [42.0]);
+            [24.3]);
         return Task.FromResult(hourly);
     }
 }

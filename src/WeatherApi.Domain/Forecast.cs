@@ -1,3 +1,3 @@
 namespace WeatherApi.Domain;
 
-public sealed record Forecast(string Address, Coordinates Coordinates, HourlyShortwaveRadiation Hourly);
+public sealed record Forecast(string Address, Coordinates Coordinates, HourlyTemperature Hourly);

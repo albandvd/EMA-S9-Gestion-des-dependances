@@ -23,15 +23,15 @@ public sealed class ForecastServiceTests
     {
         const string address = "Alès";
         var coordinates = new Coordinates(44.1253665, 4.0852818);
-        var hourly = new HourlyShortwaveRadiation(
+        var hourly = new HourlyTemperature(
             [new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero)],
-            [123.4]);
+            [24.3]);
 
         _geocodingClient
             .Setup(c => c.GeocodeAsync(address, It.IsAny<CancellationToken>()))
             .ReturnsAsync(coordinates);
         _weatherClient
-            .Setup(c => c.GetHourlyShortwaveRadiationAsync(coordinates, It.IsAny<CancellationToken>()))
+            .Setup(c => c.GetHourlyTemperatureAsync(coordinates, It.IsAny<CancellationToken>()))
             .ReturnsAsync(hourly);
 
         var sut = CreateSut();
@@ -41,8 +41,9 @@ public sealed class ForecastServiceTests
         Assert.Equal(address, result.Address);
         Assert.Equal(coordinates.Latitude, result.Latitude);
         Assert.Equal(coordinates.Longitude, result.Longitude);
-        Assert.Equal(hourly.Time, result.Hourly.Time);
-        Assert.Equal(hourly.ShortwaveRadiation, result.Hourly.ShortwaveRadiation);
+        var point = Assert.Single(result.Hourly);
+        Assert.Equal(hourly.Time[0], point.Time);
+        Assert.Equal(hourly.TemperatureCelsius[0], point.TemperatureCelsius);
     }
 
     [Fact]
@@ -59,7 +60,7 @@ public sealed class ForecastServiceTests
             () => sut.GetForecastAsync(address, CancellationToken.None));
         Assert.Equal(address, exception.Address);
         _weatherClient.Verify(
-            c => c.GetHourlyShortwaveRadiationAsync(It.IsAny<Coordinates>(), It.IsAny<CancellationToken>()),
+            c => c.GetHourlyTemperatureAsync(It.IsAny<Coordinates>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
@@ -86,7 +87,7 @@ public sealed class ForecastServiceTests
             .Setup(c => c.GeocodeAsync(address, It.IsAny<CancellationToken>()))
             .ReturnsAsync(coordinates);
         _weatherClient
-            .Setup(c => c.GetHourlyShortwaveRadiationAsync(coordinates, It.IsAny<CancellationToken>()))
+            .Setup(c => c.GetHourlyTemperatureAsync(coordinates, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new WeatherServiceException("The weather service is unavailable."));
 
         var sut = CreateSut();

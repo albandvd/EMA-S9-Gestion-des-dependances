@@ -23,12 +23,14 @@ public sealed class ForecastService(IGeocodingClient geocodingClient, IWeatherCl
             throw new AddressNotFoundException(address);
         }
 
-        var hourly = await weatherClient.GetHourlyShortwaveRadiationAsync(coordinates, cancellationToken);
+        var hourly = await weatherClient.GetHourlyTemperatureAsync(coordinates, cancellationToken);
 
-        return new ForecastResponse(
-            address,
-            coordinates.Latitude,
-            coordinates.Longitude,
-            new HourlyShortwaveRadiationResponse(hourly.Time, hourly.ShortwaveRadiation));
+        var points = new List<HourlyForecastPoint>(hourly.Time.Count);
+        for (var i = 0; i < hourly.Time.Count; i++)
+        {
+            points.Add(new HourlyForecastPoint(hourly.Time[i], hourly.TemperatureCelsius[i]));
+        }
+
+        return new ForecastResponse(address, coordinates.Latitude, coordinates.Longitude, points);
     }
 }

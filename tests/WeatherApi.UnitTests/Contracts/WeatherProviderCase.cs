@@ -23,16 +23,16 @@ public sealed record WeatherProviderCase(
         "OpenMeteo",
         http => new OpenMeteoWeatherClient(
             http,
-            Options.Create(new OpenMeteoOptions { BaseUrl = "https://stub.invalid/", HourlyParameters = "shortwave_radiation" }),
+            Options.Create(new OpenMeteoOptions { BaseUrl = "https://stub.invalid/", HourlyParameters = "temperature_2m" }),
             NullLogger<OpenMeteoWeatherClient>.Instance),
-        ValidCoordinatesResponseBody: """{"latitude":44.12,"longitude":4.08,"hourly":{"time":["2024-01-01T00:00:00Z","2024-01-01T01:00:00Z"],"shortwave_radiation":[0,12.5]}}""",
+        ValidCoordinatesResponseBody: """{"latitude":44.12,"longitude":4.08,"hourly":{"time":["2024-01-01T00:00:00Z","2024-01-01T01:00:00Z"],"temperature_2m":[0,12.5]}}""",
         ExpectedHourCount: 2,
-        NoForecastResponseBody: """{"latitude":44.12,"longitude":4.08,"hourly":{"time":[],"shortwave_radiation":[]}}""");
+        NoForecastResponseBody: """{"latitude":44.12,"longitude":4.08,"hourly":{"time":[],"temperature_2m":[]}}""");
 
     public static readonly WeatherProviderCase MetNorway = new(
         "MetNorway",
         http => new MetNorwayWeatherClient(http, NullLogger<MetNorwayWeatherClient>.Instance),
-        ValidCoordinatesResponseBody: """{"properties":{"timeseries":[{"time":"2024-01-01T00:00:00Z"},{"time":"2024-01-01T01:00:00Z"}]}}""",
+        ValidCoordinatesResponseBody: """{"properties":{"timeseries":[{"time":"2024-01-01T00:00:00Z","data":{"instant":{"details":{"air_temperature":0}}}},{"time":"2024-01-01T01:00:00Z","data":{"instant":{"details":{"air_temperature":12.5}}}}]}}""",
         ExpectedHourCount: 2,
         NoForecastResponseBody: """{"properties":{"timeseries":[]}}""");
 

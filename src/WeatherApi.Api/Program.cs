@@ -13,7 +13,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "Weather API",
         Version = "v1",
-        Description = "Resolves an address to coordinates via Nominatim and returns the Open-Meteo shortwave radiation forecast."
+        Description = "Resolves an address to coordinates and returns the hourly temperature forecast."
     });
 });
 

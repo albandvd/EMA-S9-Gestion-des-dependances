@@ -22,4 +22,25 @@ public sealed class MetNorwayTimeseriesEntry
 {
     [JsonPropertyName("time")]
     public DateTimeOffset Time { get; set; }
+
+    [JsonPropertyName("data")]
+    public MetNorwayData? Data { get; set; }
+}
+
+public sealed class MetNorwayData
+{
+    [JsonPropertyName("instant")]
+    public MetNorwayInstant? Instant { get; set; }
+}
+
+public sealed class MetNorwayInstant
+{
+    [JsonPropertyName("details")]
+    public MetNorwayDetails? Details { get; set; }
+}
+
+public sealed class MetNorwayDetails
+{
+    [JsonPropertyName("air_temperature")]
+    public double? AirTemperature { get; set; }
 }

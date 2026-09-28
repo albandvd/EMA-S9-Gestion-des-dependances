@@ -19,7 +19,8 @@ public sealed class ForecastEndpointTests(WeatherApiFactory factory) : IClassFix
         Assert.Equal("Alès", body!.Address);
         Assert.Equal(44.1253665, body.Latitude);
         Assert.Equal(4.0852818, body.Longitude);
-        Assert.Single(body.Hourly.ShortwaveRadiation);
+        var point = Assert.Single(body.Hourly);
+        Assert.NotNull(point.TemperatureCelsius);
     }
 
     [Fact]
